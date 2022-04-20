@@ -11,9 +11,21 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomAuthController extends Controller
 {
+    private function authCheck()
+    {
+        if (Auth::check()) {
+            return Auth::user()->name;
+        }
+    }
+
     public function index()
     {
-        return view('login');
+        $username = $this->authCheck();
+        if ($username == '') {
+            return view('login');
+        } else {
+            return redirect("contactList");
+        }
     }
 
     public function customLogin(Request $request)
@@ -27,13 +39,18 @@ class CustomAuthController extends Controller
         if (Auth::attempt($credentials)) {
             return redirect()->intended('contactList');
         } else {
-            return redirect("/")->withErrors(['msg'=>'login error']);
+            return redirect("/")->withErrors(['msg' => 'login error']);
         }
     }
 
     public function registration()
     {
-        return view('registration');
+        $username = $this->authCheck();
+        if ($username == '') {
+            return view('registration');
+        } else {
+            return redirect("contactList");
+        }
     }
 
     public function customRegistration(Request $request)
